@@ -11,8 +11,22 @@
             --terminal-bg: #161b22;
             --text-color: #c9d1d9;
             --prompt-color: #58a6ff;
-            --accent-color: #7ee787; /* Green for success/DevOps */
-            --header-color: #ff7b72; /* Red-ish for commands */
+            --accent-color: #7ee787;
+            --header-color: #ff7b72;
+            --border-color: #30363d;
+            --header-bg: #21262d;
+        }
+
+        /* Light Mode Variables */
+        [data-theme="light"] {
+            --bg-color: #f0f2f5;
+            --terminal-bg: #ffffff;
+            --text-color: #24292f;
+            --prompt-color: #0969da;
+            --accent-color: #1a7f37;
+            --header-color: #cf222e;
+            --border-color: #d0d7de;
+            --header-bg: #f6f8fa;
         }
 
         body {
@@ -25,24 +39,49 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Theme Toggle Styling */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            cursor: pointer;
+            background: var(--terminal-bg);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-color);
         }
 
         .terminal-window {
             width: 100%;
-            max-width: 800px;
+            max-width: 960px; /* 20% increase from 800px */
             background-color: var(--terminal-bg);
             border-radius: 6px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             overflow: hidden;
-            border: 1px solid #30363d;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
         .terminal-header {
-            background-color: #21262d;
+            background-color: var(--header-bg);
             padding: 10px;
             display: flex;
             gap: 8px;
-            border-bottom: 1px solid #30363d;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .dot { width: 12px; height: 12px; border-radius: 50%; }
@@ -53,6 +92,7 @@
         .terminal-body {
             padding: 20px;
             line-height: 1.6;
+            font-size: 16px; /* Keeping original size */
         }
 
         .command { color: var(--header-color); font-weight: bold; }
@@ -73,16 +113,25 @@
         a:hover { text-decoration: underline; }
 
         .tag {
-            background: #238636;
-            color: white;
+            background: var(--accent-color);
+            color: var(--terminal-bg);
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 0.8em;
             margin-right: 5px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
+
+<div class="theme-toggle" id="theme-btn" title="Toggle Theme">
+    <svg id="theme-icon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+</div>
 
 <div class="terminal-window">
     <div class="terminal-header">
@@ -94,7 +143,15 @@
         <p><span class="prompt">guest@dev-portfolio:~$</span> <span class="command">whoami</span></p>
         <p class="output">
             Software Developer focused on <strong>DevOps & Automation</strong>. <br>
-            Current stack: <span class="tag">Java</span> <span class="tag">Python</span> <span class="tag">Kubernetes</span> <span class="tag">Docker</span>
+            Current stack: 
+            <span class="tag">Docker</span> 
+            <span class="tag">Kubernetes</span> 
+            <span class="tag">Terraform</span> 
+            <span class="tag">Ansible</span> 
+            <span class="tag">Prometheus</span> 
+            <span class="tag">Grafana</span> 
+            <span class="tag">Kafka</span> 
+            <span class="tag">Python</span>
         </p>
 
         <p><span class="prompt">guest@dev-portfolio:~$</span> <span class="command">ls ./current-focus</span></p>
@@ -107,7 +164,7 @@
         <p><span class="prompt">guest@dev-portfolio:~$</span> <span class="command">cat projects.log</span></p>
         <p class="output">
             > [SUCCESS] Deployed scalable microservices on K8s cluster... <br>
-            > [SUCCESS] Optimized Java backend for high-throughput messaging...
+            > [SUCCESS] Optimized system observability with Prometheus & Grafana...
         </p>
 
         <p><span class="prompt">guest@dev-portfolio:~$</span> <span class="command">ls ./contact</span></p>
@@ -120,6 +177,24 @@
         <p><span class="prompt">guest@dev-portfolio:~$</span> <span class="cursor"></span></p>
     </div>
 </div>
+
+<script>
+    const btn = document.getElementById("theme-btn");
+    const icon = document.getElementById("theme-icon");
+    const sunPath = "M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM2 13h2a1 1 0 1 0 0-2H2a1 1 0 1 0 0 2zm18 0h2a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2zM11 2v2a1 1 0 1 0 2 0V2a1 1 0 1 0-2 0zm0 18v2a1 1 0 1 0 2 0v-2a1 1 0 1 0-2 0zM5.99 4.58a1 1 0 1 0-1.41 1.41l1.41 1.41a1 1 0 1 0 1.41-1.41L5.99 4.58zm12.02 12.02a1 1 0 1 0-1.41 1.41l1.41 1.41a1 1 0 1 0 1.41-1.41l-1.41-1.41zm-12.02 0l-1.41 1.41a1 1 0 1 0 1.41 1.41l1.41-1.41a1 1 0 1 0-1.41-1.41zM18.01 4.58l-1.41 1.41a1 1 0 1 0 1.41 1.41l1.41-1.41a1 1 0 1 0-1.41-1.41z";
+    const moonPath = "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z";
+
+    btn.addEventListener("click", () => {
+        const isLight = document.body.hasAttribute("data-theme");
+        if (isLight) {
+            document.body.removeAttribute("data-theme");
+            icon.innerHTML = `<path d="${moonPath}"></path>`;
+        } else {
+            document.body.setAttribute("data-theme", "light");
+            icon.innerHTML = `<path d="${sunPath}"></path>`;
+        }
+    });
+</script>
 
 </body>
 </html>
