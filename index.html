@@ -5,45 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sumith_pittala | Terminal</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <!-- FontAwesome for clean Dev & Contact Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0a0b10;
-            --terminal-bg: rgba(22, 27, 34, 0.85);
+            --bg-color: #030305;
+            --terminal-bg: rgba(10, 12, 18, 0.75);
             --text-color: #c9d1d9;
             --prompt-color: #58a6ff;
             --accent-color: #7ee787;
             --header-color: #ff7b72;
-            --border-color: #30363d;
-            --header-bg: #21262d;
+            --border-color: #21262d;
+            --header-bg: rgba(33, 38, 45, 0.9);
             
-            /* Cyberpunk City Colors - Night */
-            --sky-bg: #050508;
-            --building-dark: #0d0e15;
-            --building-light: #161925;
-            --neon-glow: #00f0ff;
-            --neon-accent: #ff0055;
-            --train-light: #fff;
+            /* Cyber Alley Canvas - Night Mode */
+            --city-opacity: 1;
+            --rain-opacity: 0.35;
+            --neon-pink: #ff0055;
+            --neon-cyan: #00f0ff;
+            --neon-gold: #ffbd2e;
+            --asphalt-reflection: linear-gradient(180deg, transparent 60%, rgba(255, 0, 85, 0.15) 85%, rgba(0, 240, 255, 0.2) 100%);
         }
 
         [data-theme="light"] {
-            --bg-color: #e4e7eb;
-            --terminal-bg: rgba(255, 255, 255, 0.9);
+            --bg-color: #dbdee3;
+            --terminal-bg: rgba(255, 255, 255, 0.85);
             --text-color: #24292f;
             --prompt-color: #0969da;
             --accent-color: #1a7f37;
             --header-color: #cf222e;
             --border-color: #d0d7de;
-            --header-bg: #f6f8fa;
+            --header-bg: rgba(246, 248, 25fa, 0.95);
             
-            /* Cyberpunk City Colors - Day */
-            --sky-bg: #b0c4de;
-            --building-dark: #708090;
-            --building-light: #95a5a6;
-            --neon-glow: #3498db;
-            --neon-accent: #e74c3c;
-            --train-light: #e67e22;
+            /* Cyber Alley Canvas - Day Mode */
+            --city-opacity: 0.4;
+            --rain-opacity: 0.1;
+            --neon-pink: #a20036;
+            --neon-cyan: #00828a;
+            --neon-gold: #b38000;
+            --asphalt-reflection: linear-gradient(180deg, transparent 70%, rgba(255,255,255,0.5) 100%);
         }
 
         body {
@@ -58,157 +57,120 @@
             padding: 20px;
             overflow: hidden;
             position: relative;
-            transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+            transition: background-color 0.5s ease;
         }
 
-        /* --- LIVING CYBERCITY BACKGROUND --- */
-        .cybercity-bg {
+        /* --- HYPER DENSE ATMOSPHERIC BACKDROP --- */
+        .cyber-alley-container {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--sky-bg);
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1;
+            pointer-events: none;
             overflow: hidden;
-            transition: background 0.5s ease-in-out;
         }
 
-        .skyline {
+        /* Wet Ground Reflection Overlay */
+        .wet-asphalt {
             position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 70%;
+            bottom: 0; left: 0; width: 100%; height: 100%;
+            background: var(--asphalt-reflection);
+            z-index: 4;
+            transition: background 0.5s ease;
+        }
+
+        /* Vertical Massive Megastructures */
+        .tower-cluster {
+            position: absolute;
+            bottom: -50px; width: 120%; left: -10%; height: 110%;
             display: flex;
+            justify-content: space-between;
             align-items: flex-end;
-            justify-content: space-around;
+            opacity: var(--city-opacity);
+            filter: blur(1px);
+            transition: opacity 0.5s ease;
         }
 
-        .building {
-            width: 12%;
-            background: linear-gradient(0deg, var(--building-dark) 0%, var(--building-light) 100%);
+        .megastructure {
+            width: 18%; height: 100%;
+            background: linear-gradient(90deg, #050608 0%, #0b0d13 50%, #020305 100%);
             position: relative;
-            border-top: 2px solid var(--neon-glow);
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
-            transition: all 0.5s ease-in-out;
+            box-shadow: inset -5px 0 20px rgba(0,0,0,0.8);
         }
+        .m1 { height: 105%; } .m2 { height: 95%; margin-left: -5%; } .m3 { height: 115%; } .m4 { height: 100%; }
 
-        .b1 { height: 85%; } .b2 { height: 60%; } .b3 { height: 95%; } .b4 { height: 75%; } .b5 { height: 90%; }
-
-        /* Window Matrix */
-        .building::after {
-            content: "";
+        /* Neon Billboards & Cyber Signs */
+        .billboard {
             position: absolute;
-            top: 15px; left: 10%; width: 80%; height: 80%;
-            background-image: linear-gradient(rgba(255,255,255,0.1) 2px, transparent 2px),
-                              linear-gradient(90deg, rgba(255,255,255,0.1) 2px, transparent 2px);
-            background-size: 8px 12px;
-        }
-
-        /* Flying Cars / Traffic */
-        .flying-traffic {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0; left: 0;
-        }
-
-        .car {
-            position: absolute;
-            height: 3px;
+            width: 40%; left: 30%;
             border-radius: 2px;
-            opacity: 0.7;
-            animation: fly linear infinite;
+        }
+        .b-pink { 
+            top: 15%; height: 35%; background: var(--neon-pink); 
+            box-shadow: 0 0 30px var(--neon-pink); opacity: 0.6;
+        }
+        .b-cyan { 
+            top: 40%; left: 10%; width: 25%; height: 25%; background: var(--neon-cyan); 
+            box-shadow: 0 0 25px var(--neon-cyan); opacity: 0.5;
+        }
+        .b-gold { 
+            top: 8%; left: 65%; width: 25%; height: 45%; background: var(--neon-gold); 
+            box-shadow: 0 0 30px var(--neon-gold); opacity: 0.55;
         }
 
-        .car.east {
-            background: var(--neon-glow);
-            box-shadow: 0 0 8px var(--neon-glow);
-        }
-        .car.west {
-            background: var(--neon-accent);
-            box-shadow: 0 0 8px var(--neon-accent);
-        }
-
-        @keyframes fly {
-            0% { left: -10%; }
-            100% { left: 110%; }
-        }
-
-        /* Cyber Transit Train */
-        .transit-line {
+        /* Flying Vehicles in Sky Shafts */
+        .v-skyway {
             position: absolute;
-            bottom: 40%;
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.05);
-            border-bottom: 1px dashed var(--neon-glow);
+            width: 100%; height: 100%; top: 0; left: 0; z-index: 2;
+        }
+        .cyber-car {
+            position: absolute; width: 14px; height: 6px;
+            border-radius: 1px; background: #fff;
+            animation: cruise linear infinite;
+        }
+        @keyframes cruise {
+            0% { transform: translate(-50px, 0) scale(0.8); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translate(calc(100vw + 50px), -60px) scale(0.5); opacity: 0; }
         }
 
-        .train {
+        /* Rain Particle Drop Canvas */
+        .rain-canvas {
             position: absolute;
-            width: 80px;
-            height: 6px;
-            background: var(--train-light);
-            box-shadow: 0 0 12px var(--train-light);
-            top: -1px;
-            animation: train-run 8s linear infinite;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 3;
+            opacity: var(--rain-opacity);
+            pointer-events: none;
         }
 
-        @keyframes train-run {
-            0% { left: -20%; }
-            100% { left: 120%; }
-        }
-
-        /* Sidewalk/Ground Drones & Androids */
-        .ground-layer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 20px;
-            background: rgba(0,0,0,0.4);
-            border-top: 1px solid var(--neon-accent);
-        }
-
-        /* --- PORTFOLIO INTERFACE --- */
+        /* --- TERMINAL STYLING --- */
         .theme-toggle {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 20px; left: 20px;
             cursor: pointer;
             background: var(--terminal-bg);
             border: 1px solid var(--border-color);
-            padding: 10px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            padding: 10px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             z-index: 10;
-            transition: all 0.5s ease-in-out;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
         }
-
-        .theme-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        .theme-toggle i {
-            font-size: 18px;
-            color: var(--text-color);
-            transition: transform 0.5s ease;
-        }
+        .theme-toggle:hover { transform: scale(1.1); }
+        .theme-toggle i { font-size: 18px; color: var(--text-color); transition: transform 0.4s ease; }
 
         .terminal-window {
             width: 100%;
-            max-width: 960px; /* 20% expanded size */
+            max-width: 960px;
             background-color: var(--terminal-bg);
             border-radius: 8px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            box-shadow: 0 35px 80px rgba(0,0,0,0.8);
             overflow: hidden;
             border: 1px solid var(--border-color);
             z-index: 5;
-            backdrop-filter: blur(8px);
-            transition: background-color 0.5s ease-in-out, border-color 0.5s ease-in-out, box-shadow 0.5s ease;
+            backdrop-filter: blur(12px);
+            transition: background-color 0.5s ease, border-color 0.5s ease;
         }
 
         .terminal-header {
@@ -218,116 +180,66 @@
             align-items: center;
             border-bottom: 1px solid var(--border-color);
             position: relative;
-            transition: background-color 0.5s ease-in-out, border-color 0.5s ease-in-out;
         }
 
-        .window-buttons {
-            display: flex;
-            gap: 8px;
-            position: absolute;
-            left: 12px;
-        }
-
+        .window-buttons { display: flex; gap: 8px; position: absolute; left: 12px; }
         .dot { width: 12px; height: 12px; border-radius: 50%; }
-        .red { background: #ff5f56; }
-        .yellow { background: #ffbd2e; }
-        .green { background: #27c93f; }
+        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+        .window-title { width: 100%; text-align: center; font-size: 0.9em; color: var(--text-color); font-weight: 500; opacity: 0.8; }
 
-        .window-title {
-            width: 100%;
-            text-align: center;
-            font-size: 0.9em;
-            color: var(--text-color);
-            font-weight: 500;
-            opacity: 0.8;
-        }
-
-        .terminal-body {
-            padding: 25px;
-            line-height: 1.6;
-            font-size: 15px;
-        }
-
+        .terminal-body { padding: 25px; line-height: 1.6; font-size: 15px; }
         .command { color: var(--header-color); font-weight: bold; }
         .prompt { color: var(--prompt-color); }
         .output { color: var(--text-color); margin-bottom: 20px; }
         
         .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 18px;
-            background: var(--text-color);
-            vertical-align: middle;
+            display: inline-block; width: 8px; height: 18px;
+            background: var(--text-color); vertical-align: middle;
             animation: blink 1s infinite;
         }
-
         @keyframes blink { 50% { opacity: 0; } }
 
         a { color: var(--accent-color); text-decoration: none; }
         a:hover { text-decoration: underline; }
 
         .tag {
-            background: var(--header-bg);
+            background: rgba(33, 38, 45, 0.4);
             color: var(--text-color);
             border: 1px solid var(--border-color);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            margin-right: 6px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 6px;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            padding: 4px 10px; border-radius: 4px; font-size: 0.85em;
+            margin-right: 6px; display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 6px; font-weight: 500;
         }
-        
-        .tag i {
-            color: var(--prompt-color);
-        }
+        .tag i { color: var(--prompt-color); }
 
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 6px;
-        }
-
-        .contact-item i {
-            width: 16px;
-            color: var(--prompt-color);
-        }
+        .contact-item { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .contact-item i { width: 16px; color: var(--prompt-color); }
     </style>
 </head>
 <body>
 
-<!-- Animated Cyberpunk Backdrop -->
-<div class="cybercity-bg">
-    <div class="flying-traffic">
-        <div class="car east" style="top: 15%; animation-duration: 6s; animation-delay: 0s;"></div>
-        <div class="car west" style="top: 25%; animation-duration: 9s; animation-delay: 2s; animation-direction: reverse;"></div>
-        <div class="car east" style="top: 45%; animation-duration: 5s; animation-delay: 1s;"></div>
-        <div class="car west" style="top: 60%; animation-duration: 11s; animation-delay: 4s; animation-direction: reverse;"></div>
+<!-- Micro Cyber Alley Canvas Layer -->
+<div class="cyber-alley-container">
+    <div class="v-skyway">
+        <div class="cyber-car" style="top: 20%; left: -10%; background: var(--neon-cyan); box-shadow: 0 0 12px var(--neon-cyan); animation-duration: 7s; animation-delay: 0s;"></div>
+        <div class="cyber-car" style="top: 45%; left: -10%; background: var(--neon-pink); box-shadow: 0 0 12px var(--neon-pink); animation-duration: 10s; animation-delay: 3s;"></div>
     </div>
-    <div class="skyline">
-        <div class="building b1"></div>
-        <div class="building b2"></div>
-        <div class="building b3"></div>
-        <div class="building b4"></div>
-        <div class="building b5"></div>
+    <div class="tower-cluster">
+        <div class="megastructure m1"><div class="billboard b-pink"></div></div>
+        <div class="megastructure m2"></div>
+        <div class="megastructure m3"><div class="billboard b-gold"></div></div>
+        <div class="megastructure m4"><div class="billboard b-cyan"></div></div>
     </div>
-    <div class="transit-line">
-        <div class="train"></div>
-    </div>
-    <div class="ground-layer"></div>
+    <canvas class="rain-canvas" id="rainLayer"></canvas>
+    <div class="wet-asphalt"></div>
 </div>
 
-<!-- Theme Switcher -->
-<div class="theme-toggle" id="theme-btn" title="Toggle System State">
+<!-- Mode Switcher -->
+<div class="theme-toggle" id="theme-btn" title="Toggle Environmental Lighting">
     <i class="fas fa-moon" id="theme-icon"></i>
 </div>
 
-<!-- Main Terminal Window -->
+<!-- Interactive UI Terminal Window -->
 <div class="terminal-window">
     <div class="terminal-header">
         <div class="window-buttons">
@@ -354,22 +266,22 @@
 
         <p><span class="prompt">guest@sumith-infra:~$</span> <span class="command">cat experience.txt</span></p>
         <p class="output">
-            <strong>Education:</strong> B.Sc. Physical Science (Computer Science) | Delhi University (2023 - 2026)<br>
+            <strong>Education:</strong> B.Sc. Physical Science (Computer Science) | Delhi University (2023 - 2026)[cite: 1]<br>
             <strong>Focus:</strong> Infrastructure-as-Code, Self-Healing Clusters, and Declarative GitOps Toolchains.
         </p>
 
         <p><span class="prompt">guest@sumith-infra:~$</span> <span class="command">cat projects.log</span></p>
         <p class="output">
-            > [SUCCESS] <strong>AIOps Self-Healing Infrastructure:</strong> Integrated alert webhooks with Python remediation logic; reduced MTTR by ~60%.<br>
-            > [SUCCESS] <strong>Cloud Observability Pipeline:</strong> Modularized AKS cluster provisioning in Terraform with automated Helm metrics target discovery.<br>
-            > [SUCCESS] <strong>GitOps Provisioning System:</strong> Developed parameterized configurations deploying cloud architectures with Argo CD sync engines.
+            > [SUCCESS] <strong>AIOps Self-Healing Infrastructure:</strong> Integrated alert webhooks with Python remediation logic; reduced MTTR by ~60%[cite: 1].<br>
+            > [SUCCESS] <strong>Cloud Observability Pipeline:</strong> Modularized AKS cluster provisioning in Terraform with automated Helm metrics target discovery[cite: 1].<br>
+            > [SUCCESS] <strong>GitOps Provisioning System:</strong> Developed parameterized configurations deploying cloud architectures with Argo CD sync engines[cite: 1].
         </p>
 
         <p><span class="prompt">guest@sumith-infra:~$</span> <span class="command">ls ./contact</span></p>
         <div class="output">
-            <div class="contact-item"><i class="fas fa-envelope"></i> Email: <a href="mailto:sumithpittala@gmail.com">sumithpittala@gmail.com</a></div>
-            <div class="contact-item"><i class="fab fa-github"></i> GitHub: <a href="https://github.com/sumithpittala" target="_blank">github.com/sumithpittala</a></div>
-            <div class="contact-item"><i class="fas fa-globe"></i> Website: <a href="https://sumtihpittala.github.io" target="_blank">sumtihpittala.github.io</a></div>
+            <div class="contact-item"><i class="fas fa-envelope"></i> Email: <a href="mailto:sumithpittala@gmail.com">sumithpittala@gmail.com</a>[cite: 1]</div>
+            <div class="contact-item"><i class="fab fa-github"></i> GitHub: <a href="https://github.com/sumithpittala" target="_blank">github.com/sumithpittala</a>[cite: 1]</div>
+            <div class="contact-item"><i class="fas fa-globe"></i> Website: <a href="https://sumtihpittala.github.io" target="_blank">sumtihpittala.github.io</a>[cite: 1]</div>
         </div>
 
         <p><span class="prompt">guest@sumith-infra:~$</span> <span class="cursor"></span></p>
@@ -377,14 +289,13 @@
 </div>
 
 <script>
+    // Theme Switch Logic
     const btn = document.getElementById("theme-btn");
     const icon = document.getElementById("theme-icon");
 
     btn.addEventListener("click", () => {
         const isLight = document.body.hasAttribute("data-theme");
-        
-        // Subtle Rotation Spin on Icon Toggle
-        icon.style.transform = "rotate(360deg)";
+        icon.style.transform = "rotate(180deg) scale(0.5)";
         
         setTimeout(() => {
             if (isLight) {
@@ -394,9 +305,55 @@
                 document.body.setAttribute("data-theme", "light");
                 icon.className = "fas fa-sun";
             }
-            icon.style.transform = "rotate(0deg)";
-        }, 200);
+            icon.style.transform = "rotate(0deg) scale(1)";
+        }, 250);
     });
+
+    // High Performance HTML5 Rain Matrix Animation
+    const canvas = document.getElementById('rainLayer');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const maxDrops = 140;
+    const drops = [];
+    for (let i = 0; i < maxDrops; i++) {
+        drops.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            velY: 12 + Math.random() * 8,
+            len: 15 + Math.random() * 20
+        });
+    }
+
+    function animateRain() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = document.body.hasAttribute("data-theme") ? 'rgba(0,0,0,0.15)' : 'rgba(201, 209, 217, 0.25)';
+        ctx.lineWidth = 1;
+        
+        for (let i = 0; i < maxDrops; i++) {
+            const d = drops[i];
+            ctx.beginPath();
+            ctx.moveTo(d.x, d.y);
+            ctx.lineTo(d.x - 1, d.y + d.len); // Slight angle down slant
+            ctx.stroke();
+            
+            d.y += d.velY;
+            d.x -= 0.5; // Wind displacement
+            
+            if (d.y > canvas.height) {
+                d.y = -d.len;
+                d.x = Math.random() * canvas.width;
+            }
+        }
+        requestAnimationFrame(animateRain);
+    }
+    animateRain();
 </script>
 
 </body>
