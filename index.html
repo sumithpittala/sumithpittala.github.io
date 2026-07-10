@@ -9,7 +9,7 @@
     <style>
         :root {
             --bg-color: #030305;
-            --terminal-bg: rgba(10, 12, 18, 0.75);
+            --terminal-bg: rgba(10, 12, 18, 0.85);
             --text-color: #c9d1d9;
             --prompt-color: #58a6ff;
             --accent-color: #7ee787;
@@ -21,7 +21,7 @@
 
         [data-theme="light"] {
             --bg-color: #dbdee3;
-            --terminal-bg: rgba(255, 255, 255, 0.8);
+            --terminal-bg: rgba(255, 255, 255, 0.88);
             --text-color: #24292f;
             --prompt-color: #0969da;
             --accent-color: #1a7f37;
@@ -46,13 +46,19 @@
             transition: background-color 0.5s ease-in-out;
         }
 
-        /* --- DUAL VIDEO BACKGROUNDS --- */
+        /* --- DUAL VIDEO BACKGROUNDS WITH FIXED FALLBACKS --- */
         .video-bg-container {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1;
             overflow: hidden;
             pointer-events: none;
+            background-color: #0a0b10; /* Strict fallback so screen is never pure black/blank */
+            transition: background-color 0.5s ease-in-out;
+        }
+
+        [data-theme="light"] .video-bg-container {
+            background-color: #dbdee3;
         }
 
         .video-bg-container video {
@@ -61,11 +67,12 @@
             width: 100%; height: 100%;
             object-fit: cover;
             transition: opacity 0.6s ease-in-out;
+            background: transparent;
         }
 
         /* Initial Opacities */
-        #video-dark { opacity: 1; }
-        #video-light { opacity: 0; }
+        #video-dark { opacity: 1; z-index: 3; }
+        #video-light { opacity: 0; z-index: 2; }
 
         /* Cross-fade handling via data attribute */
         [data-theme="light"] #video-dark { opacity: 0; }
@@ -75,7 +82,7 @@
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: var(--overlay-bg);
-            z-index: 2;
+            z-index: 4;
             transition: background 0.6s ease-in-out;
         }
 
@@ -91,7 +98,159 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             z-index: 10;
             backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             transition: all 0.3s ease;
         }
         .theme-toggle:hover { transform: scale(1.1); }
-        .theme-toggle i { font-size: 18px
+        .theme-toggle i { font-size: 18px; color: var(--text-color); transition: transform 0.4s ease; }
+
+        /* --- TERMINAL STYLING --- */
+        .terminal-window {
+            width: 100%;
+            max-width: 960px;
+            background-color: var(--terminal-bg);
+            border-radius: 8px;
+            box-shadow: 0 35px 80px rgba(0,0,0,0.8);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            z-index: 5;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .terminal-header {
+            background-color: var(--header-bg);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+
+        .window-buttons { display: flex; gap: 8px; position: absolute; left: 12px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+        .window-title { width: 100%; text-align: center; font-size: 0.9em; color: var(--text-color); font-weight: 500; opacity: 0.8; }
+
+        .terminal-body { padding: 25px; line-height: 1.6; font-size: 15px; }
+        .command { color: var(--header-color); font-weight: bold; }
+        .prompt { color: var(--prompt-color); }
+        .output { color: var(--text-color); margin-bottom: 20px; }
+        
+        .cursor {
+            display: inline-block; width: 8px; height: 18px;
+            background: var(--text-color); vertical-align: middle;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .tag {
+            background: rgba(33, 38, 45, 0.4);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px; border-radius: 4px; font-size: 0.85em;
+            margin-right: 6px; display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 6px; font-weight: 500;
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+        .tag i { color: var(--prompt-color); }
+
+        .contact-item { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .contact-item i { width: 16px; color: var(--prompt-color); }
+    </style>
+</head>
+<body>
+
+<!-- Overlapping Mode-Driven Video Container -->
+<div class="video-bg-container">
+    <video id="video-dark" autoplay muted loop playsinline>
+        <source src="video_53916acd836c.mp4" type="video/mp4">
+    </video>
+    <video id="video-light" autoplay muted loop playsinline>
+        <source src="video_c861479f8b3d.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+</div>
+
+<!-- Mode Switch Toggle -->
+<div class="theme-toggle" id="theme-btn" title="Toggle System Environment">
+    <i class="fas fa-moon" id="theme-icon"></i>
+</div>
+
+<!-- Interactive UI Terminal Window -->
+<div class="terminal-window">
+    <div class="terminal-header">
+        <div class="window-buttons">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+        </div>
+        <div class="window-title">sumith_pittala</div>
+    </div>
+    <div class="terminal-body">
+        <p><span class="prompt">guest@sumith-infra:~$</span> <span class="command">whoami</span></p>
+        <p class="output">
+            Cloud Infrastructure & DevOps Engineer specialized in Orchestration, Config Automation, and Observability.<br>
+            Tech Stack Ordered by Deployment Priority: <br>
+            <span class="tag"><i class="fab fa-docker"></i> Docker</span> 
+            <span class="tag"><i class="fas fa-dharmachakra"></i> Kubernetes</span> 
+            <span class="tag"><i class="fas fa-cloud"></i> Terraform</span> 
+            <span class="tag"><i class="fas fa-cogs"></i> Ansible</span> 
+            <span class="tag"><i class="fas fa-chart-line"></i> Prometheus</span> 
+            <span class="tag"><i class="fas fa-chart-bar"></i> Grafana</span> 
+            <span class="tag"><i class="fas fa-layer-group"></i> Kafka</span> 
+            <span class="tag"><i class="fab fa-python"></i> Python</span>
+        </p>
+
+        <p><span class="prompt">guest@sumith-infra:~$</span> <span class="command">cat experience.txt</span></p>
+        <p class="output">
+            <strong>Education:</strong> B.Sc. Physical Science (Computer Science Program) | Atma Ram Sanatan Dorado College, Delhi University (July 2023 - June 2026)<br>
+            <strong>Focus:</strong> Infrastructure-as-Code, Self-Healing Clusters, and Declarative GitOps Toolchains.
+        </p>
+
+        <p><span class="prompt">guest@sumith-infra:~$</span> <span class="command">cat projects.log</span></p>
+        <p class="output">
+            > [SUCCESS] <strong>AIOps: Self-Healing Kubernetes Infrastructure:</strong> Engineered automation workflow using Python scripts to analyze core infrastructure alerts; reduced MTTR by ~60%.<br>
+            > [SUCCESS] <strong>Cloud Observability: Automated Prometheus Stack:</strong> Provisioned AKS clusters as code using Terraform with automated Helm metrics discovery.<br>
+            > [SUCCESS] <strong>Cloud Infrastructure: Automated Provisioning:</strong> Configured Azure networks with declarative modular infrastructure profiles managed via Argo CD engines.
+        </p>
+
+        <p><span class="prompt">guest@sumith-infra:~$</span> <span class="command">ls ./contact</span></p>
+        <div class="output">
+            <div class="contact-item"><i class="fas fa-envelope"></i> Email: <a href="mailto:sumithpittala@gmail.com">sumithpittala@gmail.com</a></div>
+            <div class="contact-item"><i class="fab fa-github"></i> GitHub: <a href="https://github.com/sumithpittala" target="_blank">github.com/sumithpittala</a></div>
+            <div class="contact-item"><i class="fas fa-globe"></i> Website: <a href="https://sumtihpittala.github.io" target="_blank">sumtihpittala.github.io</a></div>
+        </div>
+
+        <p><span class="prompt">guest@sumith-infra:~$</span> <span class="cursor"></span></p>
+    </div>
+</div>
+
+<script>
+    const btn = document.getElementById("theme-btn");
+    const icon = document.getElementById("theme-icon");
+
+    btn.addEventListener("click", () => {
+        const isLight = document.body.hasAttribute("data-theme");
+        icon.style.transform = "rotate(180deg) scale(0.6)";
+        
+        setTimeout(() => {
+            if (isLight) {
+                document.body.removeAttribute("data-theme");
+                icon.className = "fas fa-moon";
+            } else {
+                document.body.setAttribute("data-theme", "light");
+                icon.className = "fas fa-sun";
+            }
+            icon.style.transform = "rotate(0deg) scale(1)";
+        }, 200);
+    });
+</script>
+
+</body>
+</html>
