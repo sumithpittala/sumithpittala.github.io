@@ -9,26 +9,26 @@
     <style>
         :root {
             --bg-color: #030305;
-            --terminal-bg: rgba(10, 12, 18, 0.85);
+            --terminal-bg: rgba(10, 12, 18, 0.70); /* 70% visibility dark */
             --text-color: #c9d1d9;
             --prompt-color: #58a6ff;
             --accent-color: #7ee787;
             --header-color: #ff7b72;
-            --border-color: #21262d;
-            --header-bg: rgba(33, 38, 45, 0.9);
-            --overlay-bg: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(3,3,5,0.7) 100%);
+            --border-color: rgba(48, 54, 61, 0.6);
+            --header-bg: rgba(33, 38, 45, 0.85);
+            --overlay-bg: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(3,3,5,0.6) 100%);
         }
 
         [data-theme="light"] {
             --bg-color: #dbdee3;
-            --terminal-bg: rgba(255, 255, 255, 0.88);
+            --terminal-bg: rgba(255, 255, 255, 0.70); /* 70% visibility light */
             --text-color: #24292f;
             --prompt-color: #0969da;
             --accent-color: #1a7f37;
             --header-color: #cf222e;
-            --border-color: #d0d7de;
-            --header-bg: rgba(246, 248, 250, 0.95);
-            --overlay-bg: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(219,222,227,0.5) 100%);
+            --border-color: rgba(208, 215, 222, 0.6);
+            --header-bg: rgba(246, 248, 250, 0.85);
+            --overlay-bg: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(219,222,227,0.4) 100%);
         }
 
         body {
@@ -40,20 +40,20 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
-            overflow: hidden;
+            padding: 40px 20px;
+            box-sizing: border-box;
             position: relative;
             transition: background-color 0.5s ease-in-out;
         }
 
-        /* --- DUAL VIDEO BACKGROUNDS WITH FIXED FALLBACKS --- */
+        /* --- DUAL VIDEO BACKGROUNDS --- */
         .video-bg-container {
-            position: absolute;
+            position: fixed; /* Fixed position prevents mobile scrolling issues */
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1;
             overflow: hidden;
             pointer-events: none;
-            background-color: #0a0b10; /* Strict fallback so screen is never pure black/blank */
+            background-color: #0a0b10;
             transition: background-color 0.5s ease-in-out;
         }
 
@@ -67,14 +67,11 @@
             width: 100%; height: 100%;
             object-fit: cover;
             transition: opacity 0.6s ease-in-out;
-            background: transparent;
         }
 
-        /* Initial Opacities */
         #video-dark { opacity: 1; z-index: 3; }
         #video-light { opacity: 0; z-index: 2; }
 
-        /* Cross-fade handling via data attribute */
         [data-theme="light"] #video-dark { opacity: 0; }
         [data-theme="light"] #video-light { opacity: 1; }
 
@@ -86,52 +83,64 @@
             transition: background 0.6s ease-in-out;
         }
 
-        /* --- TOGGLE BUTTON --- */
-        .theme-toggle {
-            position: absolute;
-            top: 20px; left: 20px;
-            cursor: pointer;
-            background: var(--header-bg);
-            border: 1px solid var(--border-color);
-            padding: 10px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 10;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            transition: all 0.3s ease;
-        }
-        .theme-toggle:hover { transform: scale(1.1); }
-        .theme-toggle i { font-size: 18px; color: var(--text-color); transition: transform 0.4s ease; }
-
-        /* --- TERMINAL STYLING --- */
+        /* --- TERMINAL STYLING WITH GLASS EFFECT --- */
         .terminal-window {
             width: 100%;
             max-width: 960px;
             background-color: var(--terminal-bg);
             border-radius: 8px;
-            box-shadow: 0 35px 80px rgba(0,0,0,0.8);
+            box-shadow: 0 35px 80px rgba(0,0,0,0.6);
             overflow: hidden;
             border: 1px solid var(--border-color);
             z-index: 5;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+            position: relative;
+            
+            /* Glassmorphism Core Engine */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            transition: background-color 0.5s ease, border-color 0.5s ease;
         }
 
         .terminal-header {
             background-color: var(--header-bg);
-            padding: 12px;
+            padding: 14px;
             display: flex;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
             position: relative;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             transition: background-color 0.5s ease, border-color 0.5s ease;
         }
 
-        .window-buttons { display: flex; gap: 8px; position: absolute; left: 12px; }
+        /* Unified Controls Layout */
+        .header-controls-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: absolute;
+            left: 14px;
+            z-index: 8;
+        }
+
+        .window-buttons { display: flex; gap: 8px; }
         .dot { width: 12px; height: 12px; border-radius: 50%; }
         .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+        
+        /* Integrated Embedded Mode Switch */
+        .theme-toggle {
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        .theme-toggle:hover { transform: scale(1.15); }
+        .theme-toggle i { font-size: 15px; color: var(--text-color); transition: transform 0.4s ease; opacity: 0.8; }
+
         .window-title { width: 100%; text-align: center; font-size: 0.9em; color: var(--text-color); font-weight: 500; opacity: 0.8; }
 
         .terminal-body { padding: 25px; line-height: 1.6; font-size: 15px; }
@@ -150,7 +159,7 @@
         a:hover { text-decoration: underline; }
 
         .tag {
-            background: rgba(33, 38, 45, 0.4);
+            background: rgba(33, 38, 45, 0.3);
             color: var(--text-color);
             border: 1px solid var(--border-color);
             padding: 4px 10px; border-radius: 4px; font-size: 0.85em;
@@ -177,18 +186,19 @@
     <div class="video-overlay"></div>
 </div>
 
-<!-- Mode Switch Toggle -->
-<div class="theme-toggle" id="theme-btn" title="Toggle System Environment">
-    <i class="fas fa-moon" id="theme-icon"></i>
-</div>
-
 <!-- Interactive UI Terminal Window -->
 <div class="terminal-window">
     <div class="terminal-header">
-        <div class="window-buttons">
-            <div class="dot red"></div>
-            <div class="dot yellow"></div>
-            <div class="dot green"></div>
+        <div class="header-controls-left">
+            <div class="window-buttons">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <!-- Integrated Switch Toggle Inside Navbar -->
+            <button class="theme-toggle" id="theme-btn" title="Toggle System Environment">
+                <i class="fas fa-moon" id="theme-icon"></i>
+            </button>
         </div>
         <div class="window-title">sumith_pittala</div>
     </div>
@@ -209,7 +219,7 @@
 
         <p><span class="prompt">guest@sumith-infra:~$</span> <span class="command">cat experience.txt</span></p>
         <p class="output">
-            <strong>Education:</strong> B.Sc. Physical Science (Computer Science Program) | Atma Ram Sanatan Dorado College, Delhi University (July 2023 - June 2026)<br>
+            <strong>Education:</strong> B.Sc. Physical Science (Computer Science Program) | Atma Ram Sanatan Dharma College, Delhi University (July 2023 - June 2026)<br>
             <strong>Focus:</strong> Infrastructure-as-Code, Self-Healing Clusters, and Declarative GitOps Toolchains.
         </p>
 
